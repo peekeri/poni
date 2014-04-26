@@ -780,6 +780,17 @@ class PoniLVConn(object):
                 iface.append(XMLE.source(bridge=inet))
             devs.append(iface)
 
+        # Set up filesystems - any hardware.fsX entries in spec
+        items = gethw("fs") or []
+        for i, item in enumerate(items):
+            fs = XMLE.filesystem(
+                XMLE.source(dir=item["source"]),
+                XMLE.target(dir=item["target"]),
+                type=item["type"], accessmode=item["accessmode"])
+            if item.get("readonly", False) is True:
+                fs.append(XMLE.readonly())
+            devs.append(fs)
+
         new_desc = etree.tostring(desc)
         vm = self.conn.defineXML(new_desc)
         self.libvirt_retry(vm.create)
