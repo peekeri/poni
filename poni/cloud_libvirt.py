@@ -435,7 +435,8 @@ class LibvirtProvider(Provider):
                     tunchan = trans.open_channel("direct-tcpip", (instance["ipv6"], 22), ("localhost", 0))
                     client = SSHClientLVP()
                     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                    client.connect_socket(tunchan, username="root", key_filename=instance["ssh_key"])
+                    client.connect_socket(tunchan, username=instance["prop"].get("user", "root"),
+                                          key_filename=instance["prop"].get("ssh_key", instance["ssh_key"]))
                     cmdchan = client.get_transport().open_session()
                     cmdchan.set_combine_stderr(True)
                     cmdchan.exec_command('ip addr show scope global')
