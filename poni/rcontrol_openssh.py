@@ -7,8 +7,10 @@ See LICENSE for details.
 """
 
 import os
+import os.path
 import subprocess
 from . import rcontrol
+from . import util
 
 
 class OpenSshRemoteControl(rcontrol.SshRemoteControl):
@@ -48,7 +50,7 @@ class OpenSshRemoteControl(rcontrol.SshRemoteControl):
 
     def cmd(self, args):
         assert isinstance(args, list)
-        full_key_path = "%s/.ssh/%s" % (os.environ["HOME"], self.key_filename)
+        full_key_path = util.expand_user_path(self.key_filename)
         command = [
             "ssh",
             "-i", full_key_path,

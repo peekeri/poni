@@ -167,6 +167,14 @@ def hash_any(ob):
     return hash(ob)
 
 
+def expand_user_path(path):
+    path = os.path.expanduser(path)
+    if os.path.isabs(path):
+        return path
+
+    return "{0}/.ssh/{1}".format(os.environ.get("HOME"), path)
+
+
 class hashed_dict(dict):
     def __hash__(self):
         return hash_any(self)

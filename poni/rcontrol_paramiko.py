@@ -12,6 +12,7 @@ import socket
 import time
 from . import errors
 from . import rcontrol
+from . import util
 import select
 import termios
 import tty
@@ -144,10 +145,7 @@ class ParamikoRemoteControl(rcontrol.SshRemoteControl):
                 self.node.name))
 
         if self.key_filename:
-            key_file = self.key_filename
-            if not os.path.isabs(key_file):
-                key_file = "%s/.ssh/%s" % (os.environ.get("HOME"),
-                                           key_file)
+            key_file = util.expand_user_path(self.key_filename)
         else:
             key_file = None
 

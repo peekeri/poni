@@ -14,6 +14,7 @@ import hashlib
 import json
 import logging
 import os
+import os.path
 import paramiko
 import random
 import re
@@ -376,7 +377,7 @@ class LibvirtProvider(Provider):
             instance["ipproto"] = prop.get("ipproto", "ipv4")
             instance["macs"] = vm.macs
             instance["ipv6"] = vm.ipv6_addr(ipv6pre)[0]
-            instance["ssh_key"] = "{0}/.ssh/{1}".format(home, prop["ssh_key"])
+            instance["ssh_key"] = util.expand_user_path(prop["ssh_key"])
             instances.append(instance)
 
         self.log.info("cloning VM instances")
@@ -435,8 +436,9 @@ class LibvirtProvider(Provider):
                     tunchan = trans.open_channel("direct-tcpip", (instance["ipv6"], 22), ("localhost", 0))
                     client = SSHClientLVP()
                     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                    key_filename = util.expand_user_path(instance["prop"].get("ssh_key", instance["ssh_key"]))
                     client.connect_socket(tunchan, username=instance["prop"].get("user", "root"),
-                                          key_filename=instance["prop"].get("ssh_key", instance["ssh_key"]))
+                                          key_filename=key_filename)
                     cmdchan = client.get_transport().open_session()
                     cmdchan.set_combine_stderr(True)
                     cmdchan.exec_command('ip addr show scope global')
